@@ -1,0 +1,42 @@
+﻿@using Bookstore.Models;
+@{
+    ViewBag.Title = "Kassan";
+}
+<h2>Kassan</h2>
+
+@if (Session["MemOrderedBooks"] == null)
+{
+    <p>Din varukorg är tom.</p>
+}
+else
+{
+    // Lista de böcker som man bokat:
+    var orderList = Session["MemOrderedBooks"] as List<Order>;
+    <table border="1">
+        <tr>
+            <td>Författare</td>
+            <td>Titel</td>
+            <td><div align="right">Styckpris</div></td>
+            <td><div align="right">Beställt</div></td>
+            <td><div align="right">Levereras</div></td>
+            <td><div align="right">Total</div></td>
+        </tr>
+        @foreach (Order orderObject in orderList)
+        {
+            <tr>
+                <td>@orderObject.Author</td>
+                <td>@orderObject.Title</td>
+                <td><div align="right">@String.Format("{0:C}", orderObject.Price)</div></td>
+                <td><div align="right">@orderObject.Copies</div></td>
+                <td><div align="right">@orderObject.Verified</div></td>
+                <td><div align="right">@String.Format("{0:C}", orderObject.VerCost)</div></td>
+            </tr>
+        }
+    </table>
+}
+
+<br />
+<form action="@Url.Action("BookSearch", "BookStore")" method="post">
+    <input type="text" name="searchString" value="" />
+    <input type="submit" value="Sök fler böcker" />
+</form>

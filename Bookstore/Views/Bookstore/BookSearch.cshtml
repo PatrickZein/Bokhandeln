@@ -1,0 +1,124 @@
+﻿@using Bookstore.Models;
+@{
+    ViewBag.Title = "BokSökning";
+}
+<h2>BokSökning</h2>
+
+@if (Session["MemBookSearch"] != null)
+{
+    // Lista de böcker som man hittat:
+    if (Session["MemSearch"] != null)
+    {
+        <p>Senaste sökning: "@((string)Session["MemSearch"])"</p>
+    }
+
+    var bookList = Session["MemBookSearch"] as List<Book>;
+    <table border="1">
+        <tr>
+            <td>Rad</td>
+            <td>Författare</td>
+            <td>Titel</td>
+            <td>Styckpris</td>
+            <td>Önskat antal</td>
+        </tr>
+        @foreach (Book bokObject in bookList)
+        {
+            if (!(bokObject.Title.Equals("count")) && !(bokObject.Price == 0))
+            {
+                <tr>
+                    <td>@bokObject.Counter</td>
+                    <td>@bokObject.Author</td>
+                    <td>@bokObject.Title</td>
+                    <td><div align="right">@String.Format("{0:C}", bokObject.Price)</div></td>
+                    <td>
+                        <form action="@Url.Action("BookSearch", "BookStore")" method="post">
+                            <input type="hidden" name="searchString" value="#order#" />
+                            <input type="hidden" name="startPos" value="@bokObject.Counter" />
+                            <input type="number" name="maxCount" value="" />
+                            <input type="submit" value="Beställ" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+
+    if (bookList.Last<Book>().Counter == 1)
+    {
+        <p>Det finns endast en bok som matchar din sökning.</p>
+    }
+    else
+    {
+        <p>Det finns totalt @(bookList.Last<Book>().Counter) böcker som matchar din sökning.</p>
+    }
+
+    // Visa valmöjligheter:
+    <table>
+        <tr>
+            @if (bookList.Last<Book>().Counter > 5)
+            {
+                // Kan man bläddra framåt?
+                if ((int)Session["MemStartPos"] + 5 <= bookList.Last<Book>().Counter)
+                {
+                    <td>
+                        <form action="@Url.Action("BookSearch", "BookStore")" method="post">
+                            <input type="hidden" name="startPos" value="@((int)Session["MemStartPos"] + 5)" />
+                            <input type="hidden" name="maxCount" value="0" />
+                            <input type="submit" value="Nästa sida" />
+                        </form>
+                    </td>
+                }
+                // Kan man bläddra bakåt?
+                if ((int)Session["MemStartPos"] > 1)
+                {
+                    <td>
+                        <form action="@Url.Action("BookSearch", "BookStore")" method="post">
+                            <input type="hidden" name="startPos" value="@((int)Session["MemStartPos"] - 5)" />
+                            <input type="hidden" name="maxCount" value="0" />
+                            <input type="submit" value="Förra sidan" />
+                        </form>
+                    </td>
+                }
+            }
+            <td>
+                <form action="@Url.Action("BookSearch", "BookStore")" method="post">
+                    <input type="text" name="searchString" value="" />
+                    <input type="submit" value="Sök" />
+                </form>
+            </td>
+            <td>
+                <form action="@Url.Action("CheckBasket", "BookStore")" method="post">
+                    <input type="submit" value="Visa korgen" />
+                </form>
+            </td>
+            <td>
+                <form action="@Url.Action("CheckOut", "BookStore")" method="post">
+                    <input type="submit" value="Gå till kassan" />
+                </form>
+            </td>
+        </tr>
+    </table>
+}
+else
+{
+    <table>
+        <tr>
+            <td>
+                <form action="@Url.Action("BookSearch", "BookStore")" method="post">
+                    <input type="text" name="searchString" value="" />
+                    <input type="submit" value="Sök" />
+                </form>
+            </td>
+            <td>
+                <form action="@Url.Action("CheckBasket", "BookStore")" method="post">
+                    <input type="submit" value="Visa korgen" />
+                </form>
+            </td>
+            <td>
+                <form action="@Url.Action("CheckOut", "BookStore")" method="post">
+                    <input type="submit" value="Gå till kassan" />
+                </form>
+            </td>
+        </tr>
+    </table>
+}

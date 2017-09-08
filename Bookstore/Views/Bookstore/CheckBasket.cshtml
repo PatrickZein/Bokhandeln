@@ -1,0 +1,63 @@
+﻿@using Bookstore.Models;
+@{
+    ViewBag.Title = "VaruKorgen";
+}
+<h2>VaruKorgen</h2>
+
+@if (Session["MemOrderedBooks"] == null)
+{
+    <p>Din varukorg är tom.</p>
+}
+else
+{
+    // Lista de böcker som man bokat:
+    var orderList = Session["MemOrderedBooks"] as List<Order>;
+    <table border="1">
+        <tr>
+            <td>Författare</td>
+            <td>Titel</td>
+            <td><div align="right">Styckpris</div></td>
+            <td><div align="right">Beställt</div></td>
+                <td><div align="right">Total</div></td>
+        </tr>
+        @foreach (Order orderObject in orderList)
+        {
+            <tr>
+                <td>@orderObject.Author</td>
+                <td>@orderObject.Title</td>
+                <td><div align="right">@String.Format("{0:C}", orderObject.Price)</div></td>
+                <td><div align="right">@orderObject.Copies</div></td>
+                <td><div align="right">@String.Format("{0:C}", orderObject.TotalCost)</div></td>
+                <td>
+                    <form action="@Url.Action("CheckBasket", "BookStore")" method="post">
+                        <input type="hidden" name="action" value="remove" />
+                        <input type="hidden" name="author" value="@orderObject.Author" />
+                        <input type="hidden" name="title" value="@orderObject.Title" />
+                        <input type="submit" value="Radera" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+}
+
+<br />
+@{
+    // Visa valmöjligheter:
+    <table>
+        <tr>
+            <td>
+                <form action="@Url.Action("BookSearch", "BookStore")" method="post">
+                    <input type="text" name="searchString" value="" />
+                    <input type="submit" value="Sök" />
+                </form>
+            </td>
+            <td>
+                <form action="@Url.Action("CheckOut", "BookStore")" method="post">
+                    <input type="submit" value="Gå till kassan" />
+                </form>
+            </td>
+
+        </tr>
+    </table>
+}
